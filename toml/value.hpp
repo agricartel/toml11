@@ -410,36 +410,34 @@ class basic_value
              template<typename ...> class A>
     basic_value& operator=(const basic_value<C, T, A>& v)
     {
-        if (this != &v) {
-            this->region_info_ = v.region_info_;
-            this->comments_    = comment_type(v.comments());
-            this->type_        = v.type();
-            switch(v.type())
+        this->region_info_ = v.region_info_;
+        this->comments_    = comment_type(v.comments());
+        this->type_        = v.type();
+        switch(v.type())
+        {
+            case value_t::boolean        : assigner(boolean_        , v.boolean_        ); break;
+            case value_t::integer        : assigner(integer_        , v.integer_        ); break;
+            case value_t::floating       : assigner(floating_       , v.floating_       ); break;
+            case value_t::string         : assigner(string_         , v.string_         ); break;
+            case value_t::offset_datetime: assigner(offset_datetime_, v.offset_datetime_); break;
+            case value_t::local_datetime : assigner(local_datetime_ , v.local_datetime_ ); break;
+            case value_t::local_date     : assigner(local_date_     , v.local_date_     ); break;
+            case value_t::local_time     : assigner(local_time_     , v.local_time_     ); break;
+            case value_t::array          :
             {
-                case value_t::boolean        : assigner(boolean_        , v.boolean_        ); break;
-                case value_t::integer        : assigner(integer_        , v.integer_        ); break;
-                case value_t::floating       : assigner(floating_       , v.floating_       ); break;
-                case value_t::string         : assigner(string_         , v.string_         ); break;
-                case value_t::offset_datetime: assigner(offset_datetime_, v.offset_datetime_); break;
-                case value_t::local_datetime : assigner(local_datetime_ , v.local_datetime_ ); break;
-                case value_t::local_date     : assigner(local_date_     , v.local_date_     ); break;
-                case value_t::local_time     : assigner(local_time_     , v.local_time_     ); break;
-                case value_t::array          :
-                {
-                    array_type tmp(v.as_array(std::nothrow).begin(),
-                                v.as_array(std::nothrow).end());
-                    assigner(array_, std::move(tmp));
-                    break;
-                }
-                case value_t::table          :
-                {
-                    table_type tmp(v.as_table(std::nothrow).begin(),
-                                v.as_table(std::nothrow).end());
-                    assigner(table_, std::move(tmp));
-                    break;
-                }
-                default: break;
+                array_type tmp(v.as_array(std::nothrow).begin(),
+                            v.as_array(std::nothrow).end());
+                assigner(array_, std::move(tmp));
+                break;
             }
+            case value_t::table          :
+            {
+                table_type tmp(v.as_table(std::nothrow).begin(),
+                            v.as_table(std::nothrow).end());
+                assigner(table_, std::move(tmp));
+                break;
+            }
+            default: break;
         }
         return *this;
     }
